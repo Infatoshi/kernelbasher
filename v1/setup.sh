@@ -74,9 +74,9 @@ if $install_cuda; then
   rm cuda-keyring_1.1-1_all.deb
   sudo apt-get update -y
   sudo apt-get install -y cuda-toolkit-12-8
-  # Add to .bashrc
-  echo 'export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"' >> ~/.bashrc
-  echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.bashrc
+  # Add to .zshrc
+  echo 'export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"' >> ~/.zshrc
+  echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.zshrc
 fi
 
 # Install default packages without asking: FFmpeg
@@ -115,19 +115,19 @@ if $install_uv; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
-# Add example env vars and aliases to .bashrc (customize these)
-echo '# Custom env vars and aliases' >> ~/.bashrc
-echo 'export PATH="$HOME/.cargo/bin:$PATH"  # For uv and other Rust tools' >> ~/.bashrc
-echo 'export EDITOR=nvim  # Set Neovim as default editor' >> ~/.bashrc
-echo 'alias ll="ls -la"' >> ~/.bashrc
-echo 'alias dockerps="docker ps -a"' >> ~/.bashrc
-echo 'alias update="sudo apt update && sudo apt upgrade -y"' >> ~/.bashrc
-echo 'alias sv="source .venv/bin/activate"' >> ~/.bashrc
-echo 'alias uvs="uv venv && source .venv/bin/activate && uv pip install -r requirements.txt"' >> ~/.bashrc
-echo 'alias uvv="uv venv"' >> ~/.bashrc
-echo 'alias uvi="uv pip install"' >> ~/.bashrc
-echo 'alias uvir="uv pip install -r requirements.txt"' >> ~/.bashrc
-echo 'alias rf="rm -rf"' >> ~/.bashrc
+# Add example env vars and aliases to .zshrc (customize these)
+echo '# Custom env vars and aliases' >> ~/.zshrc
+echo 'export PATH="$HOME/.cargo/bin:$PATH"  # For uv and other Rust tools' >> ~/.zshrc
+echo 'export EDITOR=nvim  # Set Neovim as default editor' >> ~/.zshrc
+echo 'alias ll="ls -la"' >> ~/.zshrc
+echo 'alias dockerps="docker ps -a"' >> ~/.zshrc
+echo 'alias update="sudo apt update && sudo apt upgrade -y"' >> ~/.zshrc
+echo 'alias sv="source .venv/bin/activate"' >> ~/.zshrc
+echo 'alias uvs="uv venv && source .venv/bin/activate && uv pip install -r requirements.txt"' >> ~/.zshrc
+echo 'alias uvv="uv venv"' >> ~/.zshrc
+echo 'alias uvi="uv pip install"' >> ~/.zshrc
+echo 'alias uvir="uv pip install -r requirements.txt"' >> ~/.zshrc
+echo 'alias rf="rm -rf"' >> ~/.zshrc
 
 # Reload Bash config by starting a new bash shell
 bash
@@ -149,7 +149,7 @@ if $install_uv; then
 fi
 echo "Test installations: ffmpeg -version, nvim --version"
 echo "For Neovim: Run 'nvim' to let Lazy.nvim install plugins. Then run ':MasonInstallAll' if prompted."
-echo "Customize ~/.bashrc for more env vars/aliases."
+echo "Customize ~/.zshrc for more env vars/aliases."
 echo "If on a non-Debian distro (e.g., Fedora), modify apt commands to dnf/yum equivalents."
 echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404."
 

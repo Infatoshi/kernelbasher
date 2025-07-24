@@ -11,14 +11,32 @@ sudo apt upgrade -y
 # Install prerequisites (e.g., curl, git, etc., if not present)
 sudo apt install -y curl git software-properties-common
 
-# Install Docker immediately
-echo "Installing Docker..."
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-rm get-docker.sh
-# Start and enable Docker service
-sudo systemctl start docker
-sudo systemctl enable docker
+# Check if Docker is installed
+docker_installed=false
+if docker --version >/dev/null 2>&1; then
+  docker_installed=true
+fi
+
+# Ask to install Docker if not installed
+install_docker=false
+if ! $docker_installed; then
+  echo "Docker not detected. Do you want to install Docker? (y/n)"
+  read -r answer
+  if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+    install_docker=true
+  fi
+fi
+
+# Install Docker if selected
+if $install_docker; then
+  echo "Installing Docker..."
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
+  rm get-docker.sh
+  # Start and enable Docker service
+  sudo systemctl start docker
+  sudo systemctl enable docker
+fi
 
 # Check if CUDA is installed
 cuda_installed=false
@@ -49,7 +67,7 @@ if $install_cuda; then
   echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.bashrc
 fi
 
-# Install default packages without asking: FFmpeg, Neovim, uv
+# Install default packages without asking: FFmpeg, Neovim
 sudo apt install -y ffmpeg
 
 # Install latest Neovim via PPA
@@ -81,8 +99,26 @@ EOF
 # Install vim-plug for Neovim plugins (optional; customize as needed)
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-# Install uv (Python package manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Check if uv is installed
+uv_installed=false
+if uv --version >/dev/null 2>&1; then
+  uv_installed=true
+fi
+
+# Ask to install uv if not installed
+install_uv=false
+if ! $uv_installed; then
+  echo "uv not detected. Do you want to install uv (Python package manager)? (y/n)"
+  read -r answer
+  if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+    install_uv=true
+  fi
+fi
+
+# Install uv if selected
+if $install_uv; then
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
 # Add example env vars and aliases to .bashrc (customize these)
 echo '# Custom env vars and aliases' >> ~/.bashrc
@@ -98,15 +134,22 @@ echo 'alias uvi="uv pip install"' >> ~/.bashrc
 echo 'alias uvir="uv pip install -r requirements.txt"' >> ~/.bashrc
 echo 'alias rf="rm -rf"' >> ~/.bashrc
 
-# Reload Bash config
-source ~/.bashrc
+# Reload Bash config by starting a new bash shell
+bash
 
-# Final instructions
+# Final instructions (this will run after exiting the new bash shell)
 echo "Setup complete!"
 if $install_cuda; then
   echo "CUDA installed. A reboot may be required for full functionality. Test with: nvcc --version"
 fi
-echo "Test installations: docker --version, uv --version, ffmpeg -version, nvim --version"
+if $install_docker; then
+  echo "Docker installed. Test with: docker --version"
+fi
+if $install_uv; then
+  echo "uv installed. Test with: uv --version"
+fi
+echo "Test installations: ffmpeg -version, nvim --version"
 echo "Customize ~/.bashrc for more env vars/aliases and ~/.config/nvim/init.vim for Neovim config."
 echo "If on a non-Debian distro (e.g., Fedora), modify apt commands to dnf/yum equivalents."
-echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404.
+echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404."
+

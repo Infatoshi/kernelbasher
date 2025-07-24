@@ -8,8 +8,17 @@ echo "Starting setup script. This assumes a Debian-based Linux (e.g., Ubuntu 22.
 sudo apt update -y
 sudo apt upgrade -y
 
-# Install dialog for checklists and other prerequisites
-sudo apt install -y dialog curl git software-properties-common
+# Install prerequisites (e.g., curl, git, etc., if not present)
+sudo apt install -y curl git software-properties-common
+
+# Install Docker immediately
+echo "Installing Docker..."
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+rm get-docker.sh
+# Start and enable Docker service
+sudo systemctl start docker
+sudo systemctl enable docker
 
 # Check if CUDA is installed
 cuda_installed=false
@@ -17,26 +26,15 @@ if nvcc -V >/dev/null 2>&1 || nvidia-smi >/dev/null 2>&1; then
   cuda_installed=true
 fi
 
-# Build checklist items
-items=( "Docker" "Install Docker" ON )
-if ! $cuda_installed; then
-  items=( "CUDA" "Install CUDA 12.8" OFF "${items[@]}" )
-fi
-
-# Show checklist
-selections=$(dialog --clear --title "Setup Options" --checklist "Select what to install:" 15 50 $((${#items[@]} / 3)) "${items[@]}" 2>&1 >/dev/tty)
-
-clear
-
-# Process selections
+# Ask to install CUDA if not installed
 install_cuda=false
-install_docker=false
-for selection in $selections; do
-  case $selection in
-    CUDA) install_cuda=true ;;
-    Docker) install_docker=true ;;
-  esac
-done
+if ! $cuda_installed; then
+  echo "CUDA not detected. Do you want to install CUDA 12.8? (y/n)"
+  read -r answer
+  if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+    install_cuda=true
+  fi
+fi
 
 # Install CUDA if selected
 if $install_cuda; then
@@ -49,17 +47,6 @@ if $install_cuda; then
   # Add to .bashrc
   echo 'export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"' >> ~/.bashrc
   echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.bashrc
-fi
-
-# Install Docker if selected
-if $install_docker; then
-  echo "Installing Docker..."
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sudo sh get-docker.sh
-  rm get-docker.sh
-  # Start and enable Docker service
-  sudo systemctl start docker
-  sudo systemctl enable docker
 fi
 
 # Install default packages without asking: FFmpeg, Neovim, uv
@@ -119,8 +106,7 @@ echo "Setup complete!"
 if $install_cuda; then
   echo "CUDA installed. A reboot may be required for full functionality. Test with: nvcc --version"
 fi
-echo "Test installations: docker --version (if installed), uv --version, ffmpeg -version, nvim --version"
+echo "Test installations: docker --version, uv --version, ffmpeg -version, nvim --version"
 echo "Customize ~/.bashrc for more env vars/aliases and ~/.config/nvim/init.vim for Neovim config."
 echo "If on a non-Debian distro (e.g., Fedora), modify apt commands to dnf/yum equivalents."
-echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404."
-
+echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404.

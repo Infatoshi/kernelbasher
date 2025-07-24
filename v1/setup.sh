@@ -80,7 +80,7 @@ if $install_cuda; then
 fi
 
 # Install default packages without asking: FFmpeg
-sudo apt install -y ffmpeg
+sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc 
 
 # Install latest Neovim via PPA
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
@@ -90,9 +90,8 @@ sudo apt install -y neovim
 # Set up NvChad with custom config from repo
 echo "Setting up Neovim with NvChad and custom config..."
 rm -rf ~/.config/nvim
-git clone https://github.com/infatoshi/kernelbasher.git ~/kernelbasher_temp
-cp -r ~/kernelbasher_temp/v1/nvim ~/.config/nvim
-rm -rf ~/kernelbasher_temp
+mkdir -p ~/.config/nvim
+git clone https://github.com/infatoshi/kernelbasher.git ~/.config/nvim
 
 # Check if uv is installed
 uv_installed=false
@@ -131,6 +130,10 @@ echo 'alias rf="rm -rf"' >> ~/.bashrc
 
 # Reload Bash config by starting a new bash shell
 bash
+
+# uv venv
+uv init
+uv add numpy pandas scikit-learn matplotlib seaborn jupyter scipy torch torchvision jax transformers tokenizers datasets accelerate peft langchain openai anthropic opencv-python pillow albumentations timm ultralytics tqdm wandb plotly streamlit gradio
 
 # Final instructions (this will run after exiting the new bash shell)
 echo "Setup complete!"

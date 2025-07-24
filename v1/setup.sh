@@ -9,7 +9,7 @@ sudo apt update -y
 sudo apt upgrade -y
 
 # Install prerequisites (e.g., curl, git, etc., if not present)
-sudo apt install -y curl git software-properties-common
+sudo apt install -y curl git software-properties-common ripgrep
 
 # Check if Docker is installed
 docker_installed=false
@@ -67,7 +67,7 @@ if $install_cuda; then
   echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.bashrc
 fi
 
-# Install default packages without asking: FFmpeg, Neovim
+# Install default packages without asking: FFmpeg
 sudo apt install -y ffmpeg
 
 # Install latest Neovim via PPA
@@ -75,29 +75,12 @@ sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update -y
 sudo apt install -y neovim
 
-# Set up a basic custom Neovim config (example: line numbers, syntax highlighting, and a plugin manager placeholder)
-mkdir -p ~/.config/nvim
-cat << EOF > ~/.config/nvim/init.vim
-" Basic settings
-set number
-set relativenumber
-set tabstop=4
-set shiftwidth=4
-set expandtab
-set autoindent
-syntax on
-filetype plugin indent on
-
-" Example: Add plugins via vim-plug (uncomment and run :PlugInstall after setup)
-" call plug#begin()
-" Plug 'junegunn/vim-easy-align'  " Example plugin
-" call plug#end()
-
-" Add your custom mappings, colorschemes, etc. here
-EOF
-
-# Install vim-plug for Neovim plugins (optional; customize as needed)
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+# Set up NvChad with custom config from repo
+echo "Setting up Neovim with NvChad and custom config..."
+rm -rf ~/.config/nvim
+git clone https://github.com/infatoshi/kernelbasher.git ~/kernelbasher_temp
+cp -r ~/kernelbasher_temp/v1/nvim ~/.config/nvim
+rm -rf ~/kernelbasher_temp
 
 # Check if uv is installed
 uv_installed=false
@@ -149,7 +132,8 @@ if $install_uv; then
   echo "uv installed. Test with: uv --version"
 fi
 echo "Test installations: ffmpeg -version, nvim --version"
-echo "Customize ~/.bashrc for more env vars/aliases and ~/.config/nvim/init.vim for Neovim config."
+echo "For Neovim: Run 'nvim' to let Lazy.nvim install plugins. Then run ':MasonInstallAll' if prompted."
+echo "Customize ~/.bashrc for more env vars/aliases."
 echo "If on a non-Debian distro (e.g., Fedora), modify apt commands to dnf/yum equivalents."
 echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404."
 

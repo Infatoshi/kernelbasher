@@ -91,7 +91,8 @@ sudo apt install -y neovim
 echo "Setting up Neovim with NvChad and custom config..."
 rm -rf ~/.config/nvim
 mkdir -p ~/.config/nvim
-git clone https://github.com/infatoshi/kernelbasher.git ~/.config/nvim
+git clone https://github.com/infatoshi/kernelbasher
+cp -r ~/kernelbasher/v1/nvim ~/.config/nvim
 
 # Check if uv is installed
 uv_installed=false

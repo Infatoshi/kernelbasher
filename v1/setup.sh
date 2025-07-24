@@ -13,16 +13,15 @@ sudo apt install -y dialog curl git software-properties-common
 
 # Check if CUDA is installed
 cuda_installed=false
-if command -v nvcc >/dev/null 2>&1; then
+if nvcc -V >/dev/null 2>&1 || nvidia-smi >/dev/null 2>&1; then
   cuda_installed=true
 fi
 
 # Build checklist items
-items=()
+items=( "Docker" "Install Docker" ON )
 if ! $cuda_installed; then
-  items+=("CUDA" "Install CUDA 12.8" OFF)
+  items=( "CUDA" "Install CUDA 12.8" OFF "${items[@]}" )
 fi
-items+=("Docker" "Install Docker" ON)
 
 # Show checklist
 selections=$(dialog --clear --title "Setup Options" --checklist "Select what to install:" 15 50 $((${#items[@]} / 3)) "${items[@]}" 2>&1 >/dev/tty)

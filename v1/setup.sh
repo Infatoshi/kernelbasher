@@ -95,13 +95,13 @@ if $install_cuda; then
 fi
 
 # Install default packages without asking: FFmpeg
-run_sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc 
+run_sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc g++ vim
 
 # Fix apt-pkg Python module issue
 run_sudo apt install -y python3-apt
 
 # Install latest Neovim via PPA
-run_sudo apt install -y neovim
+# run_sudo apt install -y neovim
 
 # Set up NvChad with custom config from repo
 # echo "Setting up Neovim with NvChad and custom config..."

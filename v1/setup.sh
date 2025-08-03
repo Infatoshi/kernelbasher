@@ -89,26 +89,13 @@ if $install_cuda; then
   rm cuda-keyring_1.1-1_all.deb
   run_sudo apt-get update -y
   run_sudo apt-get install -y cuda-toolkit-12-8
-  # Add to .zshrc
-  echo 'export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"' >> ~/.zshrc
-  echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.zshrc
+  # Add to .bashrc
+  echo 'export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"' >> ~/.bashrc
+  echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.bashrc
 fi
 
 # Install default packages without asking: FFmpeg
 run_sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc g++ vim
-
-# Fix apt-pkg Python module issue
-run_sudo apt install -y python3-apt
-
-# Install latest Neovim via PPA
-# run_sudo apt install -y neovim
-
-# Set up NvChad with custom config from repo
-# echo "Setting up Neovim with NvChad and custom config..."
-# rm -rf ~/.config/nvim
-# mkdir -p ~/.config/nvim
-# git clone https://github.com/infatoshi/kernelbasher
-# cp -r ~/kernelbasher/v1/nvim/* ~/.config/nvim
 
 # Check if uv is installed
 uv_installed=false
@@ -131,23 +118,23 @@ if $install_uv; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
-# Add example env vars and aliases to .zshrc (customize these)
-echo '# Custom env vars and aliases' >> ~/.zshrc
-echo 'export PATH="$HOME/.cargo/bin:$PATH"  # For uv and other Rust tools' >> ~/.zshrc
-echo 'export EDITOR=nvim  # Set Neovim as default editor' >> ~/.zshrc
-echo 'alias ll="ls -la"' >> ~/.zshrc
-echo 'alias dockerps="docker ps -a"' >> ~/.zshrc
-echo 'alias update="sudo apt update && sudo apt upgrade -y"' >> ~/.zshrc
-echo 'alias sv="source .venv/bin/activate"' >> ~/.zshrc
-echo 'alias uvs="uv venv && source .venv/bin/activate && uv pip install -r requirements.txt"' >> ~/.zshrc
-echo 'alias uvv="uv venv"' >> ~/.zshrc
-echo 'alias uvi="uv pip install"' >> ~/.zshrc
-echo 'alias uvir="uv pip install -r requirements.txt"' >> ~/.zshrc
-echo 'alias rf="rm -rf"' >> ~/.zshrc
-echo 'alias uvb="uv pip install numpy pandas scikit-learn matplotlib seaborn jupyter scipy torch torchvision jax transformers tokenizers datasets accelerate peft langchain openai anthropic opencv-python pillow albumentations timm ultralytics tqdm wandb plotly streamlit gradio"'
+# Add example env vars and aliases to .bashrc (customize these)
+echo '# Custom env vars and aliases' >> ~/.bashrc
+echo 'export PATH="$HOME/.cargo/bin:$PATH"  # For uv and other Rust tools' >> ~/.bashrc
+echo 'export EDITOR=nvim  # Set Neovim as default editor' >> ~/.bashrc
+echo 'alias ll="ls -la"' >> ~/.bashrc
+echo 'alias dockerps="docker ps -a"' >> ~/.bashrc
+echo 'alias update="sudo apt update && sudo apt upgrade -y"' >> ~/.bashrc
+echo 'alias sv="source .venv/bin/activate"' >> ~/.bashrc
+echo 'alias uvs="uv venv && source .venv/bin/activate && uv pip install -r requirements.txt"' >> ~/.bashrc
+echo 'alias uvv="uv venv"' >> ~/.bashrc
+echo 'alias uvi="uv pip install"' >> ~/.bashrc
+echo 'alias uvir="uv pip install -r requirements.txt"' >> ~/.bashrc
+echo 'alias rf="rm -rf"' >> ~/.bashrc
+echo 'alias uvb="uv pip install numpy pandas scikit-learn matplotlib seaborn jupyter scipy torch torchvision jax transformers tokenizers datasets accelerate peft langchain openai anthropic opencv-python pillow albumentations timm ultralytics tqdm wandb plotly streamlit gradio"' >> ~/.bashrc
 # Source the updated shell configuration
-if [ -f ~/.zshrc ]; then
-  echo "Shell configuration updated. Run 'source ~/.zshrc' to apply changes."
+if [ -f ~/.bashrc ]; then
+  echo "Shell configuration updated. Run 'source ~/.bashrc' to apply changes."
 fi
 
 # Initialize uv project if uv was installed
@@ -170,7 +157,11 @@ if $install_uv; then
 fi
 echo "Test installations: ffmpeg -version, nvim --version"
 echo "For Neovim: Run 'nvim' to let Lazy.nvim install plugins. Then run ':MasonInstallAll' if prompted."
-echo "Customize ~/.zshrc for more env vars/aliases."
+echo "Customize ~/.bashrc for more env vars/aliases."
 echo "If on a non-Debian distro (e.g., Fedora), modify apt commands to dnf/yum equivalents."
 echo "If using Ubuntu 24.04, you may need to adjust the CUDA repo to ubuntu2404."
+
+# Start a new bash shell to refresh environment variables
+echo "Starting new bash shell with updated environment..."
+exec bash
 

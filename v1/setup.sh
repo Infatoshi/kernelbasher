@@ -97,6 +97,9 @@ fi
 # Install default packages without asking: FFmpeg
 run_sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc 
 
+# Fix apt-pkg Python module issue
+run_sudo apt install -y python3-apt
+
 # Install latest Neovim via PPA
 run_sudo add-apt-repository ppa:neovim-ppa/unstable -y
 run_sudo apt update -y

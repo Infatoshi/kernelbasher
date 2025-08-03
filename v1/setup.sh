@@ -101,8 +101,6 @@ run_sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs c
 run_sudo apt install -y python3-apt
 
 # Install latest Neovim via PPA
-run_sudo add-apt-repository ppa:neovim-ppa/unstable -y
-run_sudo apt update -y
 run_sudo apt install -y neovim
 
 # Set up NvChad with custom config from repo

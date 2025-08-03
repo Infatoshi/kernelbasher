@@ -144,12 +144,17 @@ echo 'alias uvi="uv pip install"' >> ~/.zshrc
 echo 'alias uvir="uv pip install -r requirements.txt"' >> ~/.zshrc
 echo 'alias rf="rm -rf"' >> ~/.zshrc
 echo 'alias uvb="uv pip install numpy pandas scikit-learn matplotlib seaborn jupyter scipy torch torchvision jax transformers tokenizers datasets accelerate peft langchain openai anthropic opencv-python pillow albumentations timm ultralytics tqdm wandb plotly streamlit gradio"'
-# Reload Bash config by starting a new bash shell
-bash
+# Source the updated shell configuration
+if [ -f ~/.zshrc ]; then
+  echo "Shell configuration updated. Run 'source ~/.zshrc' to apply changes."
+fi
 
-# uv venv
-uv init
-uv add numpy pandas scikit-learn matplotlib seaborn jupyter scipy torch torchvision jax transformers tokenizers datasets accelerate peft langchain openai anthropic opencv-python pillow albumentations timm ultralytics tqdm wandb plotly streamlit gradio
+# Initialize uv project if uv was installed
+if $install_uv || $uv_installed; then
+  echo "Initializing uv project with common ML packages..."
+  uv init --no-readme --no-pin-python || echo "uv init failed - may need to restart shell"
+  uv add numpy pandas scikit-learn matplotlib seaborn jupyter scipy torch torchvision jax transformers tokenizers datasets accelerate peft langchain openai anthropic opencv-python pillow albumentations timm ultralytics tqdm wandb plotly streamlit gradio || echo "uv add failed - run manually after sourcing shell config"
+fi
 
 # Final instructions (this will run after exiting the new bash shell)
 echo "Setup complete!"

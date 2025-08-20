@@ -1,30 +1,25 @@
 #!/bin/bash
 set -e  # Exit on error
 
-echo "Starting setup script. This assumes a Debian-based Linux (e.g., Ubuntu 22.04). Sudo may prompt for your password."
-
-# Conditional sudo function
-run_sudo() {
-  sudo "$@"
-}
+echo "Starting setup script. This assumes a Debian-based Linux (e.g., Ubuntu 22.04) with root privileges."
 
 # Update and upgrade system packages
-run_sudo apt update -y
-run_sudo apt upgrade -y
+apt update -y
+apt upgrade -y
 
 # Install prerequisites (e.g., curl, git, etc., if not present)
-run_sudo apt install -y curl git software-properties-common ripgrep
+apt install -y curl git software-properties-common ripgrep
 
 
 # Fix NVIDIA Container Toolkit keyring if applicable
 echo "Checking and fixing NVIDIA Container Toolkit configuration..."
-run_sudo rm -f /etc/apt/sources.list.d/nvidia-container*.list
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | run_sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+rm -f /etc/apt/sources.list.d/nvidia-container*.list
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-  run_sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-run_sudo apt update -y
-run_sudo apt install -y nvidia-container-toolkit || true  # Install if not already, ignore if no GPU
+  tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+apt update -y
+apt install -y nvidia-container-toolkit || true  # Install if not already, ignore if no GPU
 
 # Check if CUDA is installed
 cuda_installed=false
@@ -46,19 +41,19 @@ fi
 if $install_cuda; then
   echo "Installing CUDA 12.8..."
   # Remove duplicate or old CUDA repos
-  run_sudo rm -f /etc/apt/sources.list.d/cuda*.list /etc/apt/sources.list.d/archive_uri-https_developer_download_nvidia_com_compute_cuda_repos_ubuntu2204_x86_64_-*.list
+  rm -f /etc/apt/sources.list.d/cuda*.list /etc/apt/sources.list.d/archive_uri-https_developer_download_nvidia_com_compute_cuda_repos_ubuntu2204_x86_64_-*.list
   wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
-  run_sudo dpkg -i cuda-keyring_1.1-1_all.deb
+  dpkg -i cuda-keyring_1.1-1_all.deb
   rm cuda-keyring_1.1-1_all.deb
-  run_sudo apt-get update -y
-  run_sudo apt-get install -y cuda-toolkit-12-8
+  apt-get update -y
+  apt-get install -y cuda-toolkit-12-8
   # Add to .bashrc
   echo 'export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"' >> ~/.bashrc
   echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"' >> ~/.bashrc
 fi
 
 # Install default packages without asking: FFmpeg
-run_sudo apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc g++ vim
+apt install -y ffmpeg ripgrep python3-pip zsh yt-dlp wget tree nodejs cmake gcc g++ vim
 
 # Check if uv is installed
 uv_installed=false
@@ -86,7 +81,7 @@ echo '# Custom env vars and aliases' >> ~/.bashrc
 echo 'export PATH="$HOME/.cargo/bin:$PATH"  # For uv and other Rust tools' >> ~/.bashrc
 echo 'export EDITOR=nvim  # Set Neovim as default editor' >> ~/.bashrc
 echo 'alias ll="ls -la"' >> ~/.bashrc
-echo 'alias update="sudo apt update && sudo apt upgrade -y"' >> ~/.bashrc
+echo 'alias update="apt update && apt upgrade -y"' >> ~/.bashrc
 echo 'alias sv="source .venv/bin/activate"' >> ~/.bashrc
 echo 'alias uvs="uv venv && source .venv/bin/activate && uv pip install -r requirements.txt"' >> ~/.bashrc
 echo 'alias uvv="uv venv"' >> ~/.bashrc

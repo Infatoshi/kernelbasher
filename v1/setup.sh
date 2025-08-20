@@ -3,20 +3,9 @@ set -e  # Exit on error
 
 echo "Starting setup script. This assumes a Debian-based Linux (e.g., Ubuntu 22.04). Sudo may prompt for your password."
 
-# Check if running inside Docker container
-in_docker=false
-if [ -f /.dockerenv ] || grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
-  in_docker=true
-  echo "Docker container detected - running without sudo"
-fi
-
 # Conditional sudo function
 run_sudo() {
-  if $in_docker; then
-    "$@"
-  else
-    sudo "$@"
-  fi
+  sudo "$@"
 }
 
 # Update and upgrade system packages
@@ -26,32 +15,6 @@ run_sudo apt upgrade -y
 # Install prerequisites (e.g., curl, git, etc., if not present)
 run_sudo apt install -y curl git software-properties-common ripgrep
 
-# Check if Docker is installed
-docker_installed=false
-if docker --version >/dev/null 2>&1; then
-  docker_installed=true
-fi
-
-# Ask to install Docker if not installed
-install_docker=false
-if ! $docker_installed; then
-  echo "Docker not detected. Do you want to install Docker? (y/n)"
-  read -r answer < /dev/tty
-  if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
-    install_docker=true
-  fi
-fi
-
-# Install Docker if selected
-if $install_docker; then
-  echo "Installing Docker..."
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  run_sudo sh get-docker.sh
-  rm get-docker.sh
-  # Start and enable Docker service
-  run_sudo systemctl start docker
-  run_sudo systemctl enable docker
-fi
 
 # Fix NVIDIA Container Toolkit keyring if applicable
 echo "Checking and fixing NVIDIA Container Toolkit configuration..."
@@ -123,7 +86,6 @@ echo '# Custom env vars and aliases' >> ~/.bashrc
 echo 'export PATH="$HOME/.cargo/bin:$PATH"  # For uv and other Rust tools' >> ~/.bashrc
 echo 'export EDITOR=nvim  # Set Neovim as default editor' >> ~/.bashrc
 echo 'alias ll="ls -la"' >> ~/.bashrc
-echo 'alias dockerps="docker ps -a"' >> ~/.bashrc
 echo 'alias update="sudo apt update && sudo apt upgrade -y"' >> ~/.bashrc
 echo 'alias sv="source .venv/bin/activate"' >> ~/.bashrc
 echo 'alias uvs="uv venv && source .venv/bin/activate && uv pip install -r requirements.txt"' >> ~/.bashrc
@@ -148,9 +110,6 @@ fi
 echo "Setup complete!"
 if $install_cuda; then
   echo "CUDA installed. A reboot may be required for full functionality. Test with: nvcc --version"
-fi
-if $install_docker; then
-  echo "Docker installed. Test with: docker --version"
 fi
 if $install_uv; then
   echo "uv installed. Test with: uv --version"
